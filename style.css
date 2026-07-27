@@ -2,65 +2,95 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: system-ui, sans-serif;
 }
 
 body {
-  background-color: #f0f2f5;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background-color: #f4f4f9;
 }
 
-.chat-container {
-  width: 90%;
-  max-width: 400px;
-  background: white;
+#chat-container {
+  width: 100%;
+  max-width: 450px;
+  height: 80vh;
+  background: #fff;
   border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
-.mensagens-box {
-  height: 300px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
+#header {
+  background: #6200ee;
+  color: white;
+  padding: 16px;
+  text-align: center;
+  font-weight: bold;
+}
+
+#messages {
+  flex: 1;
+  padding: 16px;
   overflow-y: auto;
-  margin: 15px 0;
-  background: #fafafa;
-}
-
-.msg-item {
-  margin-bottom: 8px;
-}
-
-.msg-item strong {
-  color: #007bff;
-}
-
-.input-box {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-input, button {
+.message {
+  background: #e0e0e0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 80%;
+  width: fit-content;
+  word-break: break-word;
+}
+
+.message .author {
+  font-size: 0.75rem;
+  color: #555;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+#form {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid #ddd;
+  background: #fff;
+}
+
+#form input {
   padding: 10px;
-  border-radius: 6px;
   border: 1px solid #ccc;
+  border-radius: 6px;
   outline: none;
 }
 
-button {
-  background-color: #28a745;
-  color: white;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
+#user-input {
+  width: 30%;
 }
 
-button:hover {
-  background-color: #218838;
+#message-input {
+  flex: 1;
+}
+
+#form button {
+  background: #6200ee;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#form button:hover {
+  background: #4b00b5;
 }

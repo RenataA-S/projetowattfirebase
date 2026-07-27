@@ -5,25 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat em Tempo Real</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="icone.png">
 </head>
 <body>
 
-  <div class="chat-container">
-    <h2>💬 Chat da Turma</h2>
-    
-    <!-- Caixas das Mensagens -->
-    <div id="mensagens" class="mensagens-box"></div>
-
-    <!-- Formulário de Envio -->
-    <div class="input-box">
-      <input type="text" id="usuario" placeholder="Seu nome...">
-      <input type="text" id="texto" placeholder="Digite sua mensagem...">
-      <button id="btnEnviar">Enviar</button>
-    </div>
+  <div id="chat-container">
+    <div id="header">Chat em Tempo Real</div>
+    <div id="messages"></div>
+    <form id="form">
+      <input type="text" id="user-input" placeholder="Seu nome" required />
+      <input type="text" id="message-input" placeholder="Mensagem..." required autocomplete="off" />
+      <button type="submit">Enviar</button>
+    </form>
   </div>
 
-  <!-- Conectando nosso JavaScript -->
-  <script type="module" src="script.js"></script>
+  <!-- Importando o arquivo renomeado -->
+  <script type="module" src="javascript.js"></script>
 </body>
 </html>

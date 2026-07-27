@@ -1,61 +1,78 @@
-// 1. Importa os módulos do Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  onSnapshot, 
+  query, 
+  orderBy, 
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// 2. Configuração do seu projeto
 const firebaseConfig = {
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyDnWFy0JSEDZmvmCyiQymQqJeVT9KRlkEo",
-    authDomain: "projetowattfirebase.firebaseapp.com",
-    projectId: "projetowattfirebase",
-    storageBucket: "projetowattfirebase.firebasestorage.app",
-    messagingSenderId: "65999014156",
-    appId: "1:65999014156:web:4de8c12614259ef23e2129"
+    apiKey: "AIzaSyBrWvuRGEOEPmlcuqWIaRpvVLPJtqWQI6g",
+    authDomain: "projetochat-9bcca.firebaseapp.com",
+    projectId: "projetochat-9bcca",
+    storageBucket: "projetochat-9bcca.firebasestorage.app",
+    messagingSenderId: "78865720122",
+    appId: "1:78865720122:web:b78b5eb3467ea26c51a603"
   };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-</script>
 
-
-// 3. Inicializa o Firebase e o Banco
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const msgsRef = ref(db, 'mensagens');
+const db = getFirestore(app);
+const messagesRef = collection(db, "messages");
 
-// 4. Elementos da Tela
-const inputUsuario = document.getElementById('usuario');
-const inputTexto = document.getElementById('texto');
-const btnEnviar = document.getElementById('btnEnviar');
-const caixaMensagens = document.getElementById('mensagens');
+const messagesDiv = document.getElementById("messages");
+const form = document.getElementById("form");
+const userInput = document.getElementById("user-input");
+const messageInput = document.getElementById("message-input");
 
-// 5. Função para Enviar Mensagem
-btnEnviar.addEventListener('click', () => {
-  const usuario = inputUsuario.value.trim();
-  const texto = inputTexto.value.trim();
+// Escutar mensagens em tempo real
+const q = query(messagesRef, orderBy("createdAt", "asc"));
 
-  if (usuario !== "" && texto !== "") {
-    push(msgsRef, { usuario, texto });
-    inputTexto.value = ""; // Limpa a caixa de texto
-  }
+onSnapshot(q, (snapshot) => {
+  messagesDiv.innerHTML = "";
+  
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("message");
+    
+    const authorDiv = document.createElement("div");
+    authorDiv.classList.add("author");
+    authorDiv.textContent = data.user || "Anônimo";
+    
+    const textDiv = document.createElement("div");
+    textDiv.textContent = data.text;
+    
+    msgDiv.appendChild(authorDiv);
+    msgDiv.appendChild(textDiv);
+    messagesDiv.appendChild(msgDiv);
+  });
+
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
 });
 
-// 6. Receber Mensagens em Tempo Real
-onValue(msgsRef, (snapshot) => {
-  caixaMensagens.innerHTML = "";
-  snapshot.forEach((child) => {
-    const msg = child.val();
-    const div = document.createElement('div');
-    div.classList.add('msg-item');
-    div.innerHTML = `<strong>${msg.usuario}:</strong> ${msg.texto}`;
-    caixaMensagens.appendChild(div);
-  });
-  caixaMensagens.scrollTop = caixaMensagens.scrollHeight; // Rola até o fim
+// Enviar mensagem
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  
+  const text = messageInput.value.trim();
+  const user = userInput.value.trim();
+
+  if (!text || !user) return;
+
+  try {
+    await addDoc(messagesRef, {
+      text: text,
+      user: user,
+      createdAt: serverTimestamp()
+    });
+    
+    messageInput.value = "";
+  } catch (error) {
+    console.error("Erro ao enviar mensagem: ", error);
+  }
 });
