@@ -9,20 +9,22 @@ import {
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// Credenciais do seu projeto Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyBrWvuRGEOEPmlcuqWIaRpvVLPJtqWQI6g",
-    authDomain: "projetochat-9bcca.firebaseapp.com",
-    projectId: "projetochat-9bcca",
-    storageBucket: "projetochat-9bcca.firebasestorage.app",
-    messagingSenderId: "78865720122",
-    appId: "1:78865720122:web:b78b5eb3467ea26c51a603"
-  };
+  apiKey: "AIzaSyBrWvuRGEOEPmlcuqWIaRpvVLPJtqWQI6g",
+  authDomain: "projetochat-9bcca.firebaseapp.com",
+  projectId: "projetochat-9bcca",
+  storageBucket: "projetochat-9bcca.firebasestorage.app",
+  messagingSenderId: "78865720122",
+  appId: "1:78865720122:web:b78b5eb3467ea26c51a603"
+};
 
-
+// Inicializando Firebase e Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const messagesRef = collection(db, "messages");
 
+// Selecionando os elementos HTML
 const messagesDiv = document.getElementById("messages");
 const form = document.getElementById("form");
 const userInput = document.getElementById("user-input");
@@ -52,10 +54,11 @@ onSnapshot(q, (snapshot) => {
     messagesDiv.appendChild(msgDiv);
   });
 
+  // Rolar para o final
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 });
 
-// Enviar mensagem
+// Enviar nova mensagem
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   
