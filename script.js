@@ -4,14 +4,26 @@ import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebas
 
 // 2. Configuração do seu projeto
 const firebaseConfig = {
-  apiKey: "AIzaSyDnWFy0JSEDZmvmCyiQymQqJeVT9KRlkEo",
-  authDomain: "projetowattfirebase.firebaseapp.com",
-  projectId: "projetowattfirebase",
-  storageBucket: "projetowattfirebase.firebasestorage.app",
-  messagingSenderId: "65999014156",
-  appId: "1:65999014156:web:4de8c12614259ef23e2129",
-  databaseURL: "https://projetowattfirebase-default-rtdb.firebaseio.com"
-};
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDnWFy0JSEDZmvmCyiQymQqJeVT9KRlkEo",
+    authDomain: "projetowattfirebase.firebaseapp.com",
+    projectId: "projetowattfirebase",
+    storageBucket: "projetowattfirebase.firebasestorage.app",
+    messagingSenderId: "65999014156",
+    appId: "1:65999014156:web:4de8c12614259ef23e2129"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
+
 
 // 3. Inicializa o Firebase e o Banco
 const app = initializeApp(firebaseConfig);
