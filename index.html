@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat em Tempo Real</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="icone.png">
+</head>
+<body>
+
+  <div class="chat-container">
+    <h2>💬 Chat da Turma</h2>
+    
+    <!-- Caixas das Mensagens -->
+    <div id="mensagens" class="mensagens-box"></div>
+
+    <!-- Formulário de Envio -->
+    <div class="input-box">
+      <input type="text" id="usuario" placeholder="Seu nome...">
+      <input type="text" id="texto" placeholder="Digite sua mensagem...">
+      <button id="btnEnviar">Enviar</button>
+    </div>
+  </div>
+
+  <!-- Conectando nosso JavaScript -->
+  <script type="module" src="script.js"></script>
+</body>
+</html>
