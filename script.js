@@ -28,7 +28,7 @@ const caixaMensagens = document.getElementById('chat-box'); /* Busca e armazena 
 
 
 /// 3. FUNÇÃO PARA ENVIAR MENSAGEM AO FIRESTORE
-function enviarMensagem() {
+function js() {
   const nome = campoNome.value.trim();
   const texto = campoTexto.value.trim();
 
