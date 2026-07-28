@@ -77,15 +77,18 @@
       </div>
 
       <!-- WEBCAM / JANELA DE CHAMADA -->
-      <div id="call-box" class="call-box hidden">
-        <div class="call-header">
-          <span id="call-title">📹 Chamada em Andamento...</span>
-          <button id="btn-end-call" class="btn-remove-file">❌ Encerrar</button>
-        </div>
-        <div class="video-grid">
-          <video id="local-video" autoplay playsinline muted></video>
-        </div>
-      </div>
+<div id="call-box" class="call-box hidden">
+  <div class="call-header">
+    <span id="call-title">📹 Chamada em Andamento...</span>
+    <div>
+      <button id="btn-switch-cam" class="btn-icon" title="Alternar Câmera (Interna/Externa)">🔄 Alternar Câmera</button>
+      <button id="btn-end-call" class="btn-remove-file">❌ Encerrar</button>
+    </div>
+  </div>
+  <div class="video-grid">
+    <video id="local-video" autoplay playsinline muted></video>
+  </div>
+</div>
 
       <!-- CAIXA DE MENSAGENS PRIVADAS -->
       <div id="chat-box" class="chat-box">
