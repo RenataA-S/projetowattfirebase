@@ -1,45 +1,133 @@
-<!DOCTYPE html> <!-- Declara que o documento é um arquivo HTML5 -->
-<html lang="pt-BR"> <!-- Define a linguagem principal da página como Português do Brasil -->
-<head> <!-- Início do cabeçalho da página (contém metadados e links externos) -->
-  <meta charset="UTF-8"> <!-- Define a codificação de caracteres como UTF-8 para aceitar acentos e ç -->
-  <title>Meu Chat em Tempo Real</title> <!-- Define o título que aparece na aba do navegador -->
-  <!-- Conectando nosso arquivo de estilo CSS --> <!-- Comentário descritivo -->
-  <link rel="stylesheet" href="style.css"> <!-- Importa a folha de estilo CSS externa chamada style.css -->
-</head> <!-- Fim do cabeçalho da página -->
-<body> <!-- Início do corpo do documento (conteúdo visível para o usuário) -->
+<!DOCTYPE html> <!-- Declara o padrão HTML5 -->
+<html lang="pt-BR"> <!-- Idioma do documento -->
+<head>
+  <meta charset="UTF-8"> <!-- Codificação de caracteres UTF-8 -->
+  <title>🩵 Chat Privado & Chamadas 💬</title>
+  <link rel="stylesheet" href="style.css"> <!-- Folha de estilos externa -->
+</head>
+<body>
 
+  <!-- ==================== TELA 1: APENAS LOGIN E CADASTRO ==================== -->
+  <div id="auth-container" class="card-container">
+    <h2 id="auth-title">🔐 Entrar no Chat Privado 🩵</h2>
 
-  <!-- CAIXA PRINCIPAL DO CHAT --> <!-- Comentário estrutural -->
-  <div class="chat-container"> <!-- Div principal que envolve todos os elementos do chat para centralização e layout -->
-   
-    <!-- CABEÇALHO COM TÍTULO --> <!-- Comentário estrutural -->
-    <h2>💬 Chat da Turma</h2> <!-- Título secundário do chat com um emoji decorativo -->
+    <div class="input-area">
+      <div class="input-group">
+        <label for="auth-email">✉️ E-mail:</label>
+        <input type="email" id="auth-email" class="input-lg" placeholder="📧 Digite seu e-mail aqui..." />
+      </div>
 
+      <div class="input-group">
+        <label for="auth-password">🔑 Senha:</label>
+        <input type="password" id="auth-password" class="input-lg" placeholder="🔒 Digite sua senha secreta..." />
+        
+        <!-- BARRA DE SEGURANÇA DA SENHA -->
+        <div class="security-box">
+          <div class="security-header">
+            <span class="security-label">🛡️ Segurança da Senha:</span>
+            <span id="security-text" class="security-status">Insira a senha... ⚪</span>
+          </div>
+          <div class="security-bar-background">
+            <div id="security-bar-fill" class="security-bar-fill"></div>
+          </div>
+        </div>
+      </div>
 
-    <!-- ÁREA ONDE AS MENSAGENS VÃO APARECER --> <!-- Comentário estrutural -->
-    <div id="chat-box" class="chat-box"></div> <!-- Conteiner vazio com ID e classe onde o JS inserirá as mensagens recebidas -->
+      <button id="btn-login" class="btn-lg">🚀 Entrar Agora</button>
+      <button id="btn-register" class="btn-secondary btn-lg">✨ Criar Nova Conta</button>
+    </div>
+  </div>
 
+  <!-- ==================== TELA 2: CHAT PRIVADO E CHAMADAS (ESCONDIDO ATÉ O LOGIN) ==================== -->
+  <div id="chat-container" class="card-container hidden">
+    
+    <!-- CABEÇALHO COM AÇÕES DE CHAMADA E LOGOUT -->
+    <div class="chat-header">
+      <div class="header-left">
+        <h2>💬 Chat Privado 🩵</h2>
+      </div>
+      
+      <!-- ÍCONES NO CANTO SUPERIOR DIREITO: VOZ, VÍDEO E SAIR -->
+      <div class="header-actions">
+        <button id="btn-audio-call" class="btn-icon" title="Iniciar Chamada de Voz">📞</button>
+        <button id="btn-video-call" class="btn-icon" title="Iniciar Chamada de Vídeo (Webcam)">📹</button>
+        <button id="btn-logout" class="btn-logout">🚪 Sair</button>
+      </div>
+    </div>
 
-    <!-- ÁREA DE ENTRADA (INPUTS E BOTÃO) --> <!-- Comentário estrutural -->
-    <div class="input-area"> <!-- Div receptora dos campos de texto e botão -->
-      <!-- Campo para o nome do usuário --> <!-- Comentário orientativo -->
-      <input type="text" id="username" placeholder="Seu nome..." /> <!-- Campo de texto de linha única para digitar o nome -->
-     
-      <!-- Campo para a mensagem --> <!-- Comentário orientativo -->
-      <input type="text" id="message" placeholder="Digite sua mensagem..." /> <!-- Campo de texto para digitar o conteúdo da mensagem -->
-     
-      <!-- Botão para enviar --> <!-- Comentário orientativo -->
-      <button id="send-btn">Enviar</button> <!-- Botão clicável para realizar o envio da mensagem -->
-    </div> <!-- Fim da área de entrada -->
+    <!-- BANNER DE STATUS DA CONEXÃO E PRIVACIDADE -->
+    <div class="connection-status">
+      🔒 Chat 1x1 Criptografado e Seguro — Mensagens Individuais 🛡️
+    </div>
 
+    <!-- PAINEL DE SELEÇÃO DE USUÁRIOS (MENSAGENS INDIVIDUAIS) -->
+    <div class="user-select-box">
+      <label for="select-recipient">👤 Conversar em particular com:</label>
+      <select id="select-recipient" class="input-lg">
+        <option value="">-- Selecione um usuário --</option>
+      </select>
+    </div>
 
-  </div> <!-- Fim do container principal do chat -->
+    <!-- ÁREA DE TRANSMISSÃO DA WEBCAM / CHAMADA (OCULTA POR PADRÃO) -->
+    <div id="call-box" class="call-box hidden">
+      <div class="call-header">
+        <span id="call-title">📹 Chamada em Andamento...</span>
+        <button id="btn-end-call" class="btn-remove-file">❌ Encerrar</button>
+      </div>
+      <div class="video-grid">
+        <video id="local-video" autoplay playsinline muted></video>
+      </div>
+    </div>
 
+    <!-- CAIXA DE MENSAGENS PRIVADAS -->
+    <div id="chat-box" class="chat-box">
+      <div class="empty-chat-msg">👈 Selecione um usuário acima para iniciar uma conversa privada.</div>
+    </div>
 
- <!-- IMPORTANDO O FIREBASE (VERSÃO V8 COMPATÍVEL VIA CDN) -->
+    <!-- ÁREA DE DIGITAÇÃO E ENVIOS -->
+    <div class="input-area">
+      <!-- PAINEL DE EMOJIS RÁPIDOS -->
+      <div class="emoji-picker-bar">
+        <span class="emoji-label">Clique para inserir:</span>
+        <button type="button" class="btn-emoji" data-emoji="😊">😊</button>
+        <button type="button" class="btn-emoji" data-emoji="😂">😂</button>
+        <button type="button" class="btn-emoji" data-emoji="❤️">❤️</button>
+        <button type="button" class="btn-emoji" data-emoji="🩵">🩵</button>
+        <button type="button" class="btn-emoji" data-emoji="👍">👍</button>
+        <button type="button" class="btn-emoji" data-emoji="🔥">🔥</button>
+        <button type="button" class="btn-emoji" data-emoji="🎉">🎉</button>
+        <button type="button" class="btn-emoji" data-emoji="✨">✨</button>
+        <button type="button" class="btn-emoji" data-emoji="🙏">🙏</button>
+      </div>
+
+      <!-- MENSAGEM E ANEXO -->
+      <div class="input-group">
+        <div class="message-input-wrapper">
+          <input type="text" id="message" class="input-lg" placeholder="💬 Escreva sua mensagem privada..." disabled />
+          
+          <label for="file-input" id="lbl-file-input" class="btn-attach disabled-btn" title="Anexar arquivo ou imagem">📎</label>
+          <input type="file" id="file-input" class="file-input-hidden" disabled />
+        </div>
+        
+        <!-- PREVIEW DO ANEXO -->
+        <div id="file-preview" class="file-preview hidden">
+          <span>📎 Anexo: <strong id="file-name"></strong></span>
+          <button type="button" id="btn-remove-file" class="btn-remove-file">❌</button>
+        </div>
+      </div>
+
+      <button id="send-btn" class="btn-lg" disabled>📨 Enviar Mensagem Privada</button>
+    </div>
+
+  </div>
+
+  <!-- ==================== SCRIPTS DO FIREBASE (V8) ==================== -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-  <!-- SEU ARQUIVO JAVASCRIPT -->
+  <!-- SCRIPT DA APLICAÇÃO -->
   <script src="script.js"></script>
 </body>
+</html>
