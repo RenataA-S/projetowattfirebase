@@ -8,7 +8,7 @@
 <body>
 
   <!-- ==================== TELA 1: APENAS LOGIN E CADASTRO ==================== -->
-  <div id="auth-container" class="card-container">
+  <div id="auth-container" class="card-container auth-box">
     <h2 id="auth-title">🔐 Entrar no Chat Privado 🩵</h2>
 
     <div class="input-area">
@@ -38,85 +38,95 @@
     </div>
   </div>
 
-  <!-- ==================== TELA 2: CHAT PRIVADO E CHAMADAS (ESCONDIDO ATÉ O LOGIN) ==================== -->
-  <div id="chat-container" class="card-container hidden">
+  <!-- ==================== TELA 2: CHAT COM LISTA DE CONTATOS ==================== -->
+  <div id="chat-container" class="card-container main-chat-layout hidden">
     
-    <!-- CABEÇALHO COM AÇÕES DE CHAMADA E LOGOUT -->
-    <div class="chat-header">
-      <div class="header-left">
-        <h2>💬 Chat Privado 🩵</h2>
+    <!-- PAINEL ESQUERDO: LISTA DE USUÁRIOS/CONTATOS -->
+    <div class="sidebar-users">
+      <div class="sidebar-header">
+        <h3>👥 Usuários</h3>
+        <input type="text" id="search-user" placeholder="🔍 Buscar contato..." class="input-search" />
       </div>
+
+      <div id="users-list" class="users-list">
+        <!-- Os usuários serão carregados dinamicamente via JS -->
+        <div class="empty-users">Carregando usuários...</div>
+      </div>
+    </div>
+
+    <!-- PAINEL DIREITO: CONVERSA PRIVADA & CHAMADAS -->
+    <div class="chat-main-panel">
       
-      <!-- ÍCONES NO CANTO SUPERIOR DIREITO: VOZ, VÍDEO E SAIR -->
-      <div class="header-actions">
-        <button id="btn-audio-call" class="btn-icon" title="Iniciar Chamada de Voz">📞</button>
-        <button id="btn-video-call" class="btn-icon" title="Iniciar Chamada de Vídeo (Webcam)">📹</button>
-        <button id="btn-logout" class="btn-logout">🚪 Sair</button>
-      </div>
-    </div>
-
-    <!-- BANNER DE STATUS DA CONEXÃO E PRIVACIDADE -->
-    <div class="connection-status">
-      🔒 Chat 1x1 Criptografado e Seguro — Mensagens Individuais 🛡️
-    </div>
-
-    <!-- PAINEL DE SELEÇÃO DE USUÁRIOS (MENSAGENS INDIVIDUAIS) -->
-    <div class="user-select-box">
-      <label for="select-recipient">👤 Conversar em particular com:</label>
-      <select id="select-recipient" class="input-lg">
-        <option value="">-- Selecione um usuário --</option>
-      </select>
-    </div>
-
-    <!-- ÁREA DE TRANSMISSÃO DA WEBCAM / CHAMADA (OCULTA POR PADRÃO) -->
-    <div id="call-box" class="call-box hidden">
-      <div class="call-header">
-        <span id="call-title">📹 Chamada em Andamento...</span>
-        <button id="btn-end-call" class="btn-remove-file">❌ Encerrar</button>
-      </div>
-      <div class="video-grid">
-        <video id="local-video" autoplay playsinline muted></video>
-      </div>
-    </div>
-
-    <!-- CAIXA DE MENSAGENS PRIVADAS -->
-    <div id="chat-box" class="chat-box">
-      <div class="empty-chat-msg">👈 Selecione um usuário acima para iniciar uma conversa privada.</div>
-    </div>
-
-    <!-- ÁREA DE DIGITAÇÃO E ENVIOS -->
-    <div class="input-area">
-      <!-- PAINEL DE EMOJIS RÁPIDOS -->
-      <div class="emoji-picker-bar">
-        <span class="emoji-label">Clique para inserir:</span>
-        <button type="button" class="btn-emoji" data-emoji="😊">😊</button>
-        <button type="button" class="btn-emoji" data-emoji="😂">😂</button>
-        <button type="button" class="btn-emoji" data-emoji="❤️">❤️</button>
-        <button type="button" class="btn-emoji" data-emoji="🩵">🩵</button>
-        <button type="button" class="btn-emoji" data-emoji="👍">👍</button>
-        <button type="button" class="btn-emoji" data-emoji="🔥">🔥</button>
-        <button type="button" class="btn-emoji" data-emoji="🎉">🎉</button>
-        <button type="button" class="btn-emoji" data-emoji="✨">✨</button>
-        <button type="button" class="btn-emoji" data-emoji="🙏">🙏</button>
-      </div>
-
-      <!-- MENSAGEM E ANEXO -->
-      <div class="input-group">
-        <div class="message-input-wrapper">
-          <input type="text" id="message" class="input-lg" placeholder="💬 Escreva sua mensagem privada..." disabled />
-          
-          <label for="file-input" id="lbl-file-input" class="btn-attach disabled-btn" title="Anexar arquivo ou imagem">📎</label>
-          <input type="file" id="file-input" class="file-input-hidden" disabled />
+      <!-- CABEÇALHO DO CHAT -->
+      <div class="chat-header">
+        <div class="header-left">
+          <h2 id="chat-target-title">💬 Selecione um Usuário</h2>
         </div>
         
-        <!-- PREVIEW DO ANEXO -->
-        <div id="file-preview" class="file-preview hidden">
-          <span>📎 Anexo: <strong id="file-name"></strong></span>
-          <button type="button" id="btn-remove-file" class="btn-remove-file">❌</button>
+        <!-- ÍCONES NO CANTO SUPERIOR DIREITO: VOZ, VÍDEO E SAIR -->
+        <div class="header-actions">
+          <button id="btn-audio-call" class="btn-icon" title="Iniciar Chamada de Voz" disabled>📞</button>
+          <button id="btn-video-call" class="btn-icon" title="Iniciar Chamada de Vídeo (Webcam)" disabled>📹</button>
+          <button id="btn-logout" class="btn-logout">🚪 Sair</button>
         </div>
       </div>
 
-      <button id="send-btn" class="btn-lg" disabled>📨 Enviar Mensagem Privada</button>
+      <!-- BANNER DE STATUS E PRIVACIDADE -->
+      <div class="connection-status">
+        🔒 Chat 1x1 Criptografado — Escolha uma pessoa à esquerda para conversar
+      </div>
+
+      <!-- WEBCAM / JANELA DE CHAMADA -->
+      <div id="call-box" class="call-box hidden">
+        <div class="call-header">
+          <span id="call-title">📹 Chamada em Andamento...</span>
+          <button id="btn-end-call" class="btn-remove-file">❌ Encerrar</button>
+        </div>
+        <div class="video-grid">
+          <video id="local-video" autoplay playsinline muted></video>
+        </div>
+      </div>
+
+      <!-- CAIXA DE MENSAGENS PRIVADAS -->
+      <div id="chat-box" class="chat-box">
+        <div class="empty-chat-msg">👈 Clique em qualquer pessoa na lista de usuários ao lado para abrir a conversa.</div>
+      </div>
+
+      <!-- ÁREA DE DIGITAÇÃO E ENVIOS -->
+      <div class="input-area">
+        <!-- EMOJIS RÁPIDOS -->
+        <div class="emoji-picker-bar">
+          <span class="emoji-label">Clique para inserir:</span>
+          <button type="button" class="btn-emoji" data-emoji="😊">😊</button>
+          <button type="button" class="btn-emoji" data-emoji="😂">😂</button>
+          <button type="button" class="btn-emoji" data-emoji="❤️">❤️</button>
+          <button type="button" class="btn-emoji" data-emoji="🩵">🩵</button>
+          <button type="button" class="btn-emoji" data-emoji="👍">👍</button>
+          <button type="button" class="btn-emoji" data-emoji="🔥">🔥</button>
+          <button type="button" class="btn-emoji" data-emoji="🎉">🎉</button>
+          <button type="button" class="btn-emoji" data-emoji="✨">✨</button>
+          <button type="button" class="btn-emoji" data-emoji="🙏">🙏</button>
+        </div>
+
+        <!-- MENSAGEM E ANEXO -->
+        <div class="input-group">
+          <div class="message-input-wrapper">
+            <input type="text" id="message" class="input-lg" placeholder="💬 Escreva sua mensagem privada..." disabled />
+            
+            <label for="file-input" id="lbl-file-input" class="btn-attach disabled-btn" title="Anexar arquivo ou imagem">📎</label>
+            <input type="file" id="file-input" class="file-input-hidden" disabled />
+          </div>
+          
+          <!-- PREVIEW DO ANEXO -->
+          <div id="file-preview" class="file-preview hidden">
+            <span>📎 Anexo: <strong id="file-name"></strong></span>
+            <button type="button" id="btn-remove-file" class="btn-remove-file">❌</button>
+          </div>
+        </div>
+
+        <button id="send-btn" class="btn-lg" disabled>📨 Enviar Mensagem Privada</button>
+      </div>
+
     </div>
 
   </div>
@@ -127,7 +137,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-  <!-- SCRIPT DA APLICAÇÃO -->
+  <!-- SCRIPT PRINCIPAL DA APLICAÇÃO -->
   <script src="script.js"></script>
 </body>
 </html>

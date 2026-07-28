@@ -8,12 +8,15 @@ const firebaseConfig = {
   appId: "1:78865720122:web:b78b5eb3467ea26c51a603"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
 const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// ==================== 2. MAPEAMENTO DOM ==================== //
+// ==================== 2. ELEMENTOS DOM ==================== //
 const authContainer = document.getElementById('auth-container');
 const inputAuthEmail = document.getElementById('auth-email');
 const inputAuthPassword = document.getElementById('auth-password');
@@ -24,11 +27,14 @@ const securityBarFill = document.getElementById('security-bar-fill');
 const securityText = document.getElementById('security-text');
 
 const chatContainer = document.getElementById('chat-container');
+const usersList = document.getElementById('users-list');
+const searchUser = document.getElementById('search-user');
+const chatTargetTitle = document.getElementById('chat-target-title');
+
 const btnLogout = document.getElementById('btn-logout');
 const btnAudioCall = document.getElementById('btn-audio-call');
 const btnVideoCall = document.getElementById('btn-video-call');
 
-const selectRecipient = document.getElementById('select-recipient');
 const campoTexto = document.getElementById('message');
 const btnEnviar = document.getElementById('send-btn');
 const caixaMensagens = document.getElementById('chat-box');
@@ -45,265 +51,223 @@ const callTitle = document.getElementById('call-title');
 const localVideo = document.getElementById('local-video');
 const btnEndCall = document.getElementById('btn-end-call');
 
-// Variáveis Globais de Controle
+// ESTADOS GLOBAIS
 let usuarioAtual = null;
 let destinatarioSelecionado = null;
+let listaUsuariosTodos = [];
 let escutaMensagensUnsubscribe = null;
+let escutaUsuariosUnsubscribe = null;
 let arquivoSelecionado = null;
 let localStream = null;
 
+// ==================== 3. BARRA DE SEGURANÇA DA SENHA ==================== //
+if (inputAuthPassword) {
+  inputAuthPassword.addEventListener('input', () => {
+    const senha = inputAuthPassword.value;
+    let pontos = 0;
 
-// ==================== 3. SEGURANÇA DA SENHA ==================== //
-function verificarSegurancaSenha() {
-  const senha = inputAuthPassword.value;
-  let pontos = 0;
-
-  if (senha.length === 0) {
-    securityBarFill.style.width = '0%';
-    securityBarFill.style.backgroundColor = '#e2e8f0';
-    securityText.innerHTML = 'Insira a senha... ⚪';
-    securityText.style.color = '#555';
-    return;
-  }
-
-  if (senha.length >= 6) pontos += 25;
-  if (senha.length >= 10) pontos += 25;
-  if (/[A-Z]/.test(senha)) pontos += 25;
-  if (/[0-9]/.test(senha) || /[^A-Za-z0-9]/.test(senha)) pontos += 25;
-
-  if (pontos <= 25) {
-    securityBarFill.style.width = '25%';
-    securityBarFill.style.backgroundColor = '#ef4444';
-    securityText.innerHTML = 'Fraca 🔴';
-    securityText.style.color = '#dc2626';
-  } else if (pontos <= 50) {
-    securityBarFill.style.width = '50%';
-    securityBarFill.style.backgroundColor = '#f59e0b';
-    securityText.innerHTML = 'Média 🟡';
-    securityText.style.color = '#d97706';
-  } else if (pontos <= 75) {
-    securityBarFill.style.width = '75%';
-    securityBarFill.style.backgroundColor = '#10b981';
-    securityText.innerHTML = 'Boa 🟢';
-    securityText.style.color = '#059669';
-  } else {
-    securityBarFill.style.width = '100%';
-    securityBarFill.style.backgroundColor = '#38bdf8';
-    securityText.innerHTML = 'Muito Forte 🛡️🩵';
-    securityText.style.color = '#0288d1';
-  }
-}
-inputAuthPassword.addEventListener('input', verificarSegurancaSenha);
-
-
-// ==================== 4. EMOJIS & ANEXOS ==================== //
-botoesEmoji.forEach((botao) => {
-  botao.addEventListener('click', () => {
-    if (!campoTexto.disabled) {
-      campoTexto.value += botao.getAttribute('data-emoji');
-      campoTexto.focus();
-    }
-  });
-});
-
-fileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    arquivoSelecionado = file;
-    fileNameDisplay.textContent = file.name;
-    filePreview.classList.remove('hidden');
-  }
-});
-
-btnRemoveFile.addEventListener('click', redefinirAnexo);
-
-function redefinirAnexo() {
-  arquivoSelecionado = null;
-  fileInput.value = '';
-  filePreview.classList.add('hidden');
-  fileNameDisplay.textContent = '';
-}
-
-
-// ==================== 5. CHAMADAS DE WEBCAM E VOZ ==================== //
-async function iniciarChamada(comVideo) {
-  try {
-    if (!destinatarioSelecionado) {
-      alert("⚠️ Selecione um usuário para realizar a chamada!");
+    if (!senha) {
+      if (securityBarFill) securityBarFill.style.width = '0%';
+      if (securityText) securityText.innerHTML = 'Insira a senha... ⚪';
       return;
     }
 
-    const restricoes = {
-      audio: true,
-      video: comVideo
-    };
+    if (senha.length >= 6) pontos += 25;
+    if (senha.length >= 10) pontos += 25;
+    if (/[A-Z]/.test(senha)) pontos += 25;
+    if (/[0-9]/.test(senha) || /[^A-Za-z0-9]/.test(senha)) pontos += 25;
 
-    localStream = await navigator.mediaDevices.getUserMedia(restricoes);
-    localVideo.srcObject = localStream;
-    callBox.classList.remove('hidden');
-
-    callTitle.textContent = comVideo 
-      ? `📹 Chamada de Vídeo com ${destinatarioSelecionado.email}...` 
-      : `📞 Chamada de Voz com ${destinatarioSelecionado.email}...`;
-
-  } catch (error) {
-    console.error("Erro ao acessar câmera/microfone:", error);
-    alert("❌ Permissão negada ou webcam/microfone não encontrado!");
-  }
+    if (securityBarFill) securityBarFill.style.width = `${pontos}%`;
+    if (securityText) {
+      if (pontos <= 25) {
+        securityBarFill.style.backgroundColor = '#ef4444';
+        securityText.innerHTML = 'Fraca 🔴';
+      } else if (pontos <= 50) {
+        securityBarFill.style.backgroundColor = '#f59e0b';
+        securityText.innerHTML = 'Média 🟡';
+      } else if (pontos <= 75) {
+        securityBarFill.style.backgroundColor = '#10b981';
+        securityText.innerHTML = 'Boa 🟢';
+      } else {
+        securityBarFill.style.backgroundColor = '#38bdf8';
+        securityText.innerHTML = 'Forte 🛡️';
+      }
+    }
+  });
 }
 
-function encerrarChamada() {
-  if (localStream) {
-    localStream.getTracks().forEach(track => track.stop());
-  }
-  localVideo.srcObject = null;
-  callBox.classList.add('hidden');
+// ==================== 4. AUTENTICAÇÃO E SESSÃO ==================== //
+if (btnLogin) {
+  btnLogin.addEventListener('click', () => {
+    const email = inputAuthEmail.value.trim();
+    const senha = inputAuthPassword.value.trim();
+    if (!email || !senha) return alert('⚠️ Preencha e-mail e senha!');
+    
+    auth.signInWithEmailAndPassword(email, senha)
+      .catch((err) => alert('❌ Erro no login: ' + err.message));
+  });
 }
 
-btnVideoCall.addEventListener('click', () => iniciarChamada(true));
-btnAudioCall.addEventListener('click', () => iniciarChamada(false));
-btnEndCall.addEventListener('click', encerrarChamada);
+if (btnRegister) {
+  btnRegister.addEventListener('click', () => {
+    const email = inputAuthEmail.value.trim();
+    const senha = inputAuthPassword.value.trim();
+    if (!email || !senha) return alert('⚠️ Preencha e-mail e senha!');
 
-
-// ==================== 6. AUTENTICAÇÃO E TROCA DE TELAS ==================== //
-function realizarLogin() {
-  const email = inputAuthEmail.value.trim();
-  const senha = inputAuthPassword.value.trim();
-
-  if (!email || !senha) {
-    alert('⚠️ Preencha e-mail e senha!');
-    return;
-  }
-
-  auth.signInWithEmailAndPassword(email, senha)
-    .then(() => {
-      inputAuthEmail.value = '';
-      inputAuthPassword.value = '';
-      verificarSegurancaSenha();
-    })
-    .catch((err) => alert('❌ Falha ao entrar: ' + err.message));
+    auth.createUserWithEmailAndPassword(email, senha)
+      .then((cred) => {
+        // Grava o usuário cadastrado diretamente no Firestore Console na coleção "usuarios"
+        return db.collection("usuarios").doc(cred.user.uid).set({
+          uid: cred.user.uid,
+          email: cred.user.email.toLowerCase(),
+          criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      })
+      .then(() => alert('✨ Conta criada com sucesso!'))
+      .catch((err) => alert('❌ Erro no cadastro: ' + err.message));
+  });
 }
 
-function criarConta() {
-  const email = inputAuthEmail.value.trim();
-  const senha = inputAuthPassword.value.trim();
-
-  if (!email || !senha) {
-    alert('⚠️ Preencha e-mail e senha!');
-    return;
-  }
-
-  auth.createUserWithEmailAndPassword(email, senha)
-    .then((credencial) => {
-      return db.collection("usuarios").doc(credencial.user.uid).set({
-        uid: credencial.user.uid,
-        email: credencial.user.email
-      });
-    })
-    .then(() => {
-      alert('✨ Conta criada com sucesso!');
-      inputAuthEmail.value = '';
-      inputAuthPassword.value = '';
-    })
-    .catch((err) => alert('❌ Erro ao criar conta: ' + err.message));
+if (btnLogout) {
+  btnLogout.addEventListener('click', () => auth.signOut());
 }
 
-btnLogout.addEventListener('click', () => auth.signOut());
-btnLogin.addEventListener('click', realizarLogin);
-btnRegister.addEventListener('click', criarConta);
-
-
-// OUVINTE DE ESTADO DO USUÁRIO (CONTROLA A EXIBIÇÃO DAS TELAS)
+// OUVINTE DE ESTADO DE AUTENTICAÇÃO
 auth.onAuthStateChanged((user) => {
   if (user) {
     usuarioAtual = user;
-    
-    // OCULTA TELA DE LOGIN E MOSTRA A TELA DO CHAT
-    authContainer.classList.add('hidden');
-    chatContainer.classList.remove('hidden');
+    if (authContainer) authContainer.classList.add('hidden');
+    if (chatContainer) chatContainer.classList.remove('hidden');
 
+    // Salva ou atualiza a entrada do usuário no banco de dados Firestore
     db.collection("usuarios").doc(user.uid).set({
       uid: user.uid,
-      email: user.email
+      email: user.email.toLowerCase(),
+      ultimoAcesso: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
     carregarListaUsuarios();
   } else {
     usuarioAtual = null;
+    destinatarioSelecionado = null;
     encerrarChamada();
+    if (escutaUsuariosUnsubscribe) escutaUsuariosUnsubscribe();
+    if (escutaMensagensUnsubscribe) escutaMensagensUnsubscribe();
+    if (chatContainer) chatContainer.classList.add('hidden');
+    if (authContainer) authContainer.classList.remove('hidden');
     
-    // OCULTA TELA DO CHAT E MOSTRA APENAS O LOGIN
-    chatContainer.classList.add('hidden');
-    authContainer.classList.remove('hidden');
+    desativarControlesChat();
   }
 });
 
-
-// ==================== 7. SELEÇÃO DE USUÁRIOS E CHAT PRIVADO ==================== //
+// ==================== 5. BUSCAR USUÁRIOS DO BANCO DE DADOS (FIRESTORE) ==================== //
 function carregarListaUsuarios() {
-  db.collection("usuarios").onSnapshot((snapshot) => {
-    selectRecipient.innerHTML = '<option value="">-- Selecione um usuário --</option>';
+  if (escutaUsuariosUnsubscribe) escutaUsuariosUnsubscribe();
+
+  // Escuta em tempo real a coleção 'usuarios' do Firestore Console
+  escutaUsuariosUnsubscribe = db.collection("usuarios").onSnapshot((snapshot) => {
+    listaUsuariosTodos = [];
     
     snapshot.forEach((doc) => {
       const u = doc.data();
-      if (u.uid !== usuarioAtual.uid) {
-        const option = document.createElement('option');
-        option.value = u.uid;
-        option.textContent = u.email;
-        option.dataset.email = u.email;
-        selectRecipient.appendChild(option);
+      // Adiciona todos os usuários do banco (exceto o próprio usuário logado)
+      if (u.uid !== usuarioAtual.uid && u.email) {
+        listaUsuariosTodos.push(u);
       }
     });
+
+    const termoBusca = searchUser ? searchUser.value.trim().toLowerCase() : '';
+    filtrarERenderizarUsuarios(termoBusca);
+  }, (error) => {
+    console.error("Erro ao puxar usuários do Firestore:", error);
+    if (usersList) usersList.innerHTML = '<div class="empty-users">Erro ao carregar lista de usuários. Verifique as regras no Firebase Console.</div>';
   });
 }
 
-selectRecipient.addEventListener('change', (e) => {
-  const uidDestino = e.target.value;
-  const emailDestino = e.target.options[e.target.selectedIndex].dataset.email;
+function filtrarERenderizarUsuarios(termo) {
+  const filtrados = listaUsuariosTodos.filter(u => u.email.toLowerCase().includes(termo));
+  renderizarListaUsuarios(filtrados);
+}
 
-  if (!uidDestino) {
-    destinatarioSelecionado = null;
-    bloquearCamposChat(true);
-    caixaMensagens.innerHTML = '<div class="empty-chat-msg">👈 Selecione um usuário acima para iniciar uma conversa privada.</div>';
-    if (escutaMensagensUnsubscribe) escutaMensagensUnsubscribe();
+function renderizarListaUsuarios(lista) {
+  if (!usersList) return;
+  usersList.innerHTML = '';
+
+  if (lista.length === 0) {
+    usersList.innerHTML = '<div class="empty-users">Nenhum outro usuário encontrado no banco.</div>';
     return;
   }
 
-  destinatarioSelecionado = { uid: uidDestino, email: emailDestino };
-  bloquearCamposChat(false);
-  carregarMensagensPrivadas();
-});
+  lista.forEach((u) => {
+    const item = document.createElement('div');
+    item.classList.add('user-item');
+    if (destinatarioSelecionado && destinatarioSelecionado.uid === u.uid) {
+      item.classList.add('active');
+    }
 
-function bloquearCamposChat(bloquear) {
-  campoTexto.disabled = bloquear;
-  fileInput.disabled = bloquear;
-  btnEnviar.disabled = bloquear;
-  
-  if (bloquear) {
-    lblFileInput.classList.add('disabled-btn');
-  } else {
-    lblFileInput.classList.remove('disabled-btn');
-  }
+    const nomeExibicao = u.email ? u.email.split('@')[0] : 'Usuário';
+    const inicial = u.email ? u.email.charAt(0).toUpperCase() : '?';
+
+    item.innerHTML = `
+      <div class="user-avatar">${inicial}</div>
+      <div class="user-info">
+        <span class="user-email" title="${u.email}">${nomeExibicao}</span>
+      </div>
+    `;
+
+    item.addEventListener('click', () => selecionarUsuarioParaConversa(u));
+    usersList.appendChild(item);
+  });
 }
 
+if (searchUser) {
+  searchUser.addEventListener('input', (e) => {
+    filtrarERenderizarUsuarios(e.target.value.trim().toLowerCase());
+  });
+}
+
+function selecionarUsuarioParaConversa(usuario) {
+  destinatarioSelecionado = usuario;
+  const nomeExibicao = usuario.email ? usuario.email.split('@')[0] : 'Usuário';
+  
+  if (chatTargetTitle) chatTargetTitle.textContent = `💬 ${nomeExibicao} (${usuario.email})`;
+
+  ativarControlesChat();
+  filtrarERenderizarUsuarios(searchUser ? searchUser.value.trim().toLowerCase() : '');
+  carregarMensagensPrivadas();
+}
+
+function ativarControlesChat() {
+  if (btnAudioCall) btnAudioCall.disabled = false;
+  if (btnVideoCall) btnVideoCall.disabled = false;
+  if (campoTexto) campoTexto.disabled = false;
+  if (fileInput) fileInput.disabled = false;
+  if (btnEnviar) btnEnviar.disabled = false;
+  if (lblFileInput) lblFileInput.classList.remove('disabled-btn');
+}
+
+function desativarControlesChat() {
+  if (btnAudioCall) btnAudioCall.disabled = true;
+  if (btnVideoCall) btnVideoCall.disabled = true;
+  if (campoTexto) { campoTexto.disabled = true; campoTexto.value = ''; }
+  if (fileInput) fileInput.disabled = true;
+  if (btnEnviar) btnEnviar.disabled = true;
+  if (lblFileInput) lblFileInput.classList.add('disabled-btn');
+  if (chatTargetTitle) chatTargetTitle.textContent = '💬 Selecione um Usuário';
+  if (caixaMensagens) caixaMensagens.innerHTML = '<div class="empty-chat-msg">👈 Clique em qualquer pessoa na lista de usuários ao lado para abrir a conversa.</div>';
+}
+
+// ==================== 6. MENSAGENS E ANEXOS ==================== //
 function obterChatRoomID(uid1, uid2) {
   return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
 }
 
-
-// ==================== 8. ENVIAR E RECEBER MENSAGENS PRIVADAS ==================== //
 async function enviarMensagem() {
-  const texto = campoTexto.value.trim();
+  const texto = campoTexto ? campoTexto.value.trim() : '';
+  if (!destinatarioSelecionado) return alert("⚠️ Selecione um usuário na lista à esquerda!");
+  if (!texto && !arquivoSelecionado) return alert("⚠️ Digite uma mensagem ou anexe um arquivo!");
 
-  if (!destinatarioSelecionado) return;
-  if (!texto && !arquivoSelecionado) {
-    alert("⚠️ Digite uma mensagem ou anexe um arquivo!");
-    return;
-  }
-
-  btnEnviar.disabled = true;
-  btnEnviar.textContent = '⏳ Enviando...';
-
+  if (btnEnviar) btnEnviar.disabled = true;
   let fileData = null;
 
   try {
@@ -332,24 +296,26 @@ async function enviarMensagem() {
         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-    campoTexto.value = '';
+    if (campoTexto) campoTexto.value = '';
     redefinirAnexo();
-  } catch (error) {
-    console.error("Erro ao enviar:", error);
-    alert("❌ Erro ao enviar mensagem privada.");
+  } catch (err) {
+    console.error("Erro ao enviar mensagem:", err);
+    alert("❌ Erro ao enviar mensagem ou anexo: " + err.message);
   } finally {
-    btnEnviar.disabled = false;
-    btnEnviar.textContent = '📨 Enviar Mensagem Privada';
+    if (btnEnviar) btnEnviar.disabled = false;
   }
 }
 
-btnEnviar.addEventListener('click', enviarMensagem);
-campoTexto.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') enviarMensagem();
-});
+if (btnEnviar) btnEnviar.addEventListener('click', enviarMensagem);
+if (campoTexto) {
+  campoTexto.addEventListener('keypress', (e) => { 
+    if (e.key === 'Enter') enviarMensagem(); 
+  });
+}
 
 function carregarMensagensPrivadas() {
   if (escutaMensagensUnsubscribe) escutaMensagensUnsubscribe();
+  if (!destinatarioSelecionado) return;
 
   const chatRoomID = obterChatRoomID(usuarioAtual.uid, destinatarioSelecionado.uid);
 
@@ -358,10 +324,11 @@ function carregarMensagensPrivadas() {
     .collection("mensagens")
     .orderBy("criadoEm", "asc")
     .onSnapshot((snapshot) => {
+      if (!caixaMensagens) return;
       caixaMensagens.innerHTML = '';
 
       if (snapshot.empty) {
-        caixaMensagens.innerHTML = `<div class="empty-chat-msg">🔒 Nenhuma mensagem ainda. Inicie a conversa com ${destinatarioSelecionado.email}!</div>`;
+        caixaMensagens.innerHTML = `<div class="empty-chat-msg">🔒 Nenhuma mensagem ainda. Envie uma mensagem para ${destinatarioSelecionado.email}!</div>`;
         return;
       }
 
@@ -370,22 +337,17 @@ function carregarMensagensPrivadas() {
         const divMsg = document.createElement('div');
         divMsg.classList.add('msg');
 
-        if (msg.remetenteUid === usuarioAtual.uid) {
-          divMsg.classList.add('msg-self');
-        }
+        if (msg.remetenteUid === usuarioAtual.uid) divMsg.classList.add('msg-self');
 
-        let html = `<span class="msg-user">👤 ${msg.remetenteEmail.split('@')[0]}:</span> ${msg.texto || ''}`;
+        const nomeExibicao = msg.remetenteEmail ? msg.remetenteEmail.split('@')[0] : 'Usuário';
+        let html = `<span class="msg-user">👤 ${nomeExibicao}:</span> ${msg.texto || ''}`;
 
         if (msg.arquivo) {
-          html += `<div class="msg-attachment">`;
+          html += `<div>`;
           if (msg.arquivo.tipo && msg.arquivo.tipo.startsWith('image/')) {
-            html += `<a href="${msg.arquivo.url}" target="_blank">
-                      <img src="${msg.arquivo.url}" alt="${msg.arquivo.nome}" class="msg-image" />
-                    </a>`;
+            html += `<a href="${msg.arquivo.url}" target="_blank"><img src="${msg.arquivo.url}" class="msg-image"/></a>`;
           } else {
-            html += `<a href="${msg.arquivo.url}" target="_blank" class="msg-file-link">
-                      📄 ${msg.arquivo.nome}
-                    </a>`;
+            html += `<a href="${msg.arquivo.url}" target="_blank" class="msg-file-link">📄 ${msg.arquivo.nome}</a>`;
           }
           html += `</div>`;
         }
@@ -395,5 +357,69 @@ function carregarMensagensPrivadas() {
       });
 
       caixaMensagens.scrollTop = caixaMensagens.scrollHeight;
+    }, (error) => {
+      console.error("Erro ao carregar mensagens:", error);
     });
 }
+
+// Configuração de Anexo e Emojis
+botoesEmoji.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    if (campoTexto && !campoTexto.disabled) {
+      campoTexto.value += btn.getAttribute('data-emoji');
+      campoTexto.focus();
+    }
+  });
+});
+
+if (fileInput) {
+  fileInput.addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (f) {
+      arquivoSelecionado = f;
+      if (fileNameDisplay) fileNameDisplay.textContent = f.name;
+      if (filePreview) filePreview.classList.remove('hidden');
+    }
+  });
+}
+
+if (btnRemoveFile) btnRemoveFile.addEventListener('click', redefinirAnexo);
+
+function redefinirAnexo() {
+  arquivoSelecionado = null;
+  if (fileInput) fileInput.value = '';
+  if (filePreview) filePreview.classList.add('hidden');
+}
+
+// ==================== 7. WEBCAM E LIGAÇÃO ==================== //
+async function iniciarChamada(comVideo) {
+  try {
+    if (!destinatarioSelecionado) return alert("⚠️ Selecione um usuário para iniciar a chamada!");
+
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: comVideo });
+    if (localVideo) localVideo.srcObject = localStream;
+    if (callBox) callBox.classList.remove('hidden');
+    if (callTitle) {
+      const nomeDest = destinatarioSelecionado.email ? destinatarioSelecionado.email.split('@')[0] : 'Usuário';
+      callTitle.textContent = comVideo 
+        ? `📹 Chamada de Vídeo com ${nomeDest}` 
+        : `📞 Chamada de Voz com ${nomeDest}`;
+    }
+  } catch (err) {
+    console.error("Erro na chamada:", err);
+    alert("❌ Permissão negada ou câmera/microfone indisponível. Lembre-se de rodar a aplicação via HTTPS ou em localhost!");
+  }
+}
+
+function encerrarChamada() {
+  if (localStream) {
+    localStream.getTracks().forEach(t => t.stop());
+    localStream = null;
+  }
+  if (localVideo) localVideo.srcObject = null;
+  if (callBox) callBox.classList.add('hidden');
+}
+
+if (btnVideoCall) btnVideoCall.addEventListener('click', () => iniciarChamada(true));
+if (btnAudioCall) btnAudioCall.addEventListener('click', () => iniciarChamada(false));
+if (btnEndCall) btnEndCall.addEventListener('click', encerrarChamada);
