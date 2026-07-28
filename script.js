@@ -27,11 +27,30 @@ const btnEnviar = document.getElementById('send-btn'); /* Busca e armazena o bot
 const caixaMensagens = document.getElementById('chat-box'); /* Busca e armazena a div que exibirá as mensagens */
 
 
-// 3. FUNÇÃO PARA ENVIAR MENSAGEM AO FIRESTORE /* Título do bloco funcional de envio */
-function enviarMensagem() { /* Declara a função responsável pelo processamento e salvamento da mensagem */
-  const nome = campoNome.value.trim(); /* Obtém o texto do campo de nome e remove espaços em branco das pontas */
-  const texto = campoTexto.value.trim(); /* Obtém o texto do campo de mensagem e remove espaços das pontas */
+/// 3. FUNÇÃO PARA ENVIAR MENSAGEM AO FIRESTORE
+function enviarMensagem() {
+  const nome = campoNome.value.trim();
+  const texto = campoTexto.value.trim();
 
+  if (nome === '' || texto === '') {
+    alert('Por favor, preencha o nome e a mensagem!');
+    return;
+  }
+
+  // Grava uma nova mensagem no Firestore com data e hora do servidor
+  db.collection("mensagens").add({
+    autor: nome,
+    texto: texto,
+    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  })
+  .then(() => {
+    campoTexto.value = ''; // Limpa o campo após o envio com sucesso
+  })
+  .catch((error) => {
+    console.error("Erro ao enviar mensagem: ", error);
+    alert("Ocorreu um erro ao enviar a mensagem.");
+  });
+}
 
   if (nome === '' || texto === '') { /* Verifica se qualquer um dos dois campos está vazio */
     alert('Por favor, preencha o nome e a mensagem!'); /* Dispara um alerta nativo pedindo o preenchimento dos dados */
