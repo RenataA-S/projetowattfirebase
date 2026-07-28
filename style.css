@@ -1,96 +1,106 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, sans-serif;
-}
+/* Zerando margens e definindo fonte limpa */ /* Comentário do bloco */
+* { /* Seleciona todos os elementos HTML da página */
+  box-sizing: border-box; /* Inclui padding e borders no cálculo do tamanho total do elemento */
+  margin: 0; /* Remove as margens internas padrão de todos os elementos */
+  padding: 0; /* Remove os espaçamentos internos padrão de todos os elementos */
+  font-family: Arial, sans-serif; /* Define a família de fontes como Arial ou sans-serif genérica */
+} /* Fim do bloco de reset global */
 
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f4f4f9;
-}
 
-#chat-container {
-  width: 100%;
-  max-width: 450px;
-  height: 80vh;
-  background: #fff;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  overflow: hidden;
-}
+/* Centralizando tudo na tela com fundo suave */ /* Comentário do bloco */
+body { /* Seleciona a tag body */
+  background-color: #f0f2f5; /* Define a cor de fundo da página para um cinza bem claro */
+  display: flex; /* Ativa o layout Flexbox no elemento pai */
+  justify-content: center; /* Centraliza o conteúdo horizontalmente no ecrã */
+  align-items: center; /* Centraliza o conteúdo verticalmente no ecrã */
+  height: 100vh; /* Define a altura do body como 100% da altura da viewport (janela do navegador) */
+} /* Fim dos estilos do body */
 
-#header {
-  background: #6200ee;
-  color: white;
-  padding: 16px;
-  text-align: center;
-  font-weight: bold;
-}
 
-#messages {
-  flex: 1;
-  padding: 16px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+/* Container do chat estilizado */ /* Comentário do bloco */
+.chat-container { /* Seleciona o elemento com a classe chat-container */
+  width: 100%; /* Ocupa 100% da largura disponível até o limite definido */
+  max-width: 450px; /* Impede que o chat fique com largura superior a 450 pixels */
+  background: #ffffff; /* Define o fundo da caixa de chat como branco puro */
+  border-radius: 12px; /* Arredonda os cantos da caixa em 12 pixels */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Aplica uma sombra projetada suave ao redor do elemento */
+  padding: 20px; /* Adiciona um espaçamento interno de 20 pixels nas bordas da caixa */
+} /* Fim dos estilos do container */
 
-.message {
-  background: #e0e0e0;
-  padding: 8px 12px;
-  border-radius: 12px;
-  max-width: 80%;
-  width: fit-content;
-  word-break: break-word;
-}
 
-.message .author {
-  font-size: 0.75rem;
-  color: #555;
-  font-weight: bold;
-  margin-bottom: 2px;
-}
+/* Título em destaque */ /* Comentário do bloco */
+h2 { /* Seleciona os títulos de nível 2 */
+  text-align: center; /* Alinha o texto do título ao centro */
+  color: #333; /* Define a cor do texto para um cinza escuro */
+  margin-bottom: 15px; /* Adiciona uma margem inferior de 15 pixels */
+} /* Fim dos estilos do título */
 
-#form {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  border-top: 1px solid #ddd;
-  background: #fff;
-}
 
-#form input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  outline: none;
-}
+/* Janela onde as mensagens rolam */ /* Comentário do bloco */
+.chat-box { /* Seleciona a caixa que exibirá as mensagens */
+  height: 300px; /* Define uma altura fixa de 300 pixels */
+  border: 2px solid #e0e0e0; /* Adiciona uma borda sólida cinza claro de 2 pixels */
+  border-radius: 8px; /* Arredonda as quinas da caixa em 8 pixels */
+  overflow-y: auto; /* Adiciona barra de rolagem quando necessário */ /* Ativa a rolagem vertical se o conteúdo ultrapassar a altura */
+  padding: 10px; /* Adiciona um espaçamento interno de 10 pixels */
+  margin-bottom: 15px; /* Adiciona uma margem inferior de 15 pixels */
+  background-color: #fafafa; /* Define um fundo ligeiramente acinzentado */
+} /* Fim dos estilos do chat-box */
 
-#user-input {
-  width: 30%;
-}
 
-#message-input {
-  flex: 1;
-}
+/* Estilo de cada mensagem individual */ /* Comentário do bloco */
+.msg { /* Seleciona cada balão individual de mensagem */
+  background-color: #e1f5fe; /* Define a cor de fundo como um azul bem claro */
+  padding: 8px 12px; /* Define espaçamento interno de 8px (topo/baixo) e 12px (lados) */
+  border-radius: 8px; /* Arredonda os cantos da mensagem em 8 pixels */
+  margin-bottom: 8px; /* Adiciona um espaço de 8 pixels entre cada mensagem */
+  word-wrap: break-word; /* Quebra palavras muito longas para não estourar a largura da caixa */
+} /* Fim dos estilos de mensagem */
 
-#form button {
-  background: #6200ee;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
 
-#form button:hover {
-  background: #4b00b5;
-}
+/* Destaque para o nome de quem enviou */ /* Comentário do bloco */
+.msg-user { /* Seleciona o elemento do nome do usuário dentro da mensagem */
+  font-weight: bold; /* Deixa o texto do nome em negrito */
+  color: #0288d1; /* Define a cor do nome como um tom de azul escuro */
+} /* Fim dos estilos do nome do usuário */
+
+
+/* Organização dos campos de entrada */ /* Comentário do bloco */
+.input-area { /* Seleciona o container que envolve os inputs e botão */
+  display: flex; /* Ativa o layout Flexbox */
+  flex-direction: column; /* Organiza os elementos internos em uma coluna (um abaixo do outro) */
+  gap: 10px; /* Cria um espaçamento automático de 10 pixels entre os elementos da coluna */
+} /* Fim dos estilos da input-area */
+
+
+/* Estilo para as caixas de texto */ /* Comentário do bloco */
+input[type="text"] { /* Seleciona apenas os campos input do tipo texto */
+  padding: 12px; /* Adiciona espaçamento interno de 12 pixels */
+  border: 2px solid #ccc; /* Define uma borda cinza padrão de 2 pixels */
+  border-radius: 6px; /* Arredonda as bordas do campo em 6 pixels */
+  font-size: 14px; /* Define o tamanho da fonte interna do input como 14 pixels */
+} /* Fim dos estilos do input */
+
+
+/* Foco visual claro ao clicar nos campos */ /* Comentário do bloco */
+input[type="text"]:focus { /* Aplica estilos ao clicar/focar no campo de texto */
+  border-color: #0288d1; /* Muda a cor da borda para azul ao focar */
+  outline: none; /* Remove o contorno padrão do navegador ao selecionar o campo */
+} /* Fim dos estilos de foco */
+
+
+/* Botão interativo com feedback visual */ /* Comentário do bloco */
+button { /* Seleciona o elemento de botão */
+  padding: 12px; /* Define o espaçamento interno do botão como 12 pixels */
+  background-color: #0288d1; /* Define o fundo do botão como azul */
+  color: white; /* Define a cor do texto do botão como branca */
+  border: none; /* Remove as bordas padrão do botão */
+  border-radius: 6px; /* Arredonda as cantos em 6 pixels */
+  font-weight: bold; /* Aplica negrito ao texto do botão */
+  cursor: pointer; /* Transforma o ponteiro do mouse no ícone de mãozinha interativa */
+} /* Fim dos estilos padrão do botão */
+
+
+button:hover { /* Aplica estilos quando o ponteiro do mouse passa por cima do botão */
+  background-color: #01579b; /* Escurece o tom de azul do fundo para indicar interatividade */
+} /* Fim do estilo hover do botão */

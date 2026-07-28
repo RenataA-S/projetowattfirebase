@@ -1,24 +1,39 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat em Tempo Real</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<!DOCTYPE html> <!-- Declara que o documento é um arquivo HTML5 -->
+<html lang="pt-BR"> <!-- Define a linguagem principal da página como Português do Brasil -->
+<head> <!-- Início do cabeçalho da página (contém metadados e links externos) -->
+  <meta charset="UTF-8"> <!-- Define a codificação de caracteres como UTF-8 para aceitar acentos e ç -->
+  <title>Meu Chat em Tempo Real</title> <!-- Define o título que aparece na aba do navegador -->
+  <!-- Conectando nosso arquivo de estilo CSS --> <!-- Comentário descritivo -->
+  <link rel="stylesheet" href="style.css"> <!-- Importa a folha de estilo CSS externa chamada style.css -->
+</head> <!-- Fim do cabeçalho da página -->
+<body> <!-- Início do corpo do documento (conteúdo visível para o usuário) -->
 
-  <!-- APENAS UM CONTAINER DE CHAT -->
-  <div id="chat-container">
-    <div id="header">Chat em Tempo Real</div>
-    <div id="messages"></div>
-    <form id="form">
-      <input type="text" id="user-input" placeholder="Seu nome" required />
-      <input type="text" id="message-input" placeholder="Mensagem..." required autocomplete="off" />
-      <button type="submit">Enviar</button>
-    </form>
-  </div>
 
-  <script type="module" src="javascript.js"></script>
-</body>
-</html>
+  <!-- CAIXA PRINCIPAL DO CHAT --> <!-- Comentário estrutural -->
+  <div class="chat-container"> <!-- Div principal que envolve todos os elementos do chat para centralização e layout -->
+   
+    <!-- CABEÇALHO COM TÍTULO --> <!-- Comentário estrutural -->
+    <h2>💬 Chat da Turma</h2> <!-- Título secundário do chat com um emoji decorativo -->
+
+
+    <!-- ÁREA ONDE AS MENSAGENS VÃO APARECER --> <!-- Comentário estrutural -->
+    <div id="chat-box" class="chat-box"></div> <!-- Conteiner vazio com ID e classe onde o JS inserirá as mensagens recebidas -->
+
+
+    <!-- ÁREA DE ENTRADA (INPUTS E BOTÃO) --> <!-- Comentário estrutural -->
+    <div class="input-area"> <!-- Div receptora dos campos de texto e botão -->
+      <!-- Campo para o nome do usuário --> <!-- Comentário orientativo -->
+      <input type="text" id="username" placeholder="Seu nome..." /> <!-- Campo de texto de linha única para digitar o nome -->
+     
+      <!-- Campo para a mensagem --> <!-- Comentário orientativo -->
+      <input type="text" id="message" placeholder="Digite sua mensagem..." /> <!-- Campo de texto para digitar o conteúdo da mensagem -->
+     
+      <!-- Botão para enviar --> <!-- Comentário orientativo -->
+      <button id="send-btn">Enviar</button> <!-- Botão clicável para realizar o envio da mensagem -->
+    </div> <!-- Fim da área de entrada -->
+
+
+  </div> <!-- Fim do container principal do chat -->
+
+
+  <!-- IMPORTANDO O FIREBASE (VERSÃO V8 COMPATÍVEL VIA CDN) --> <!-- Comentário sobre a biblioteca externa -->
